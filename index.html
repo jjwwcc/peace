@@ -410,6 +410,7 @@
 
                     // Add assistant message to messages array
                     const assistantMsg = { role: 'assistant', content: response.text };
+                    console.log(response.text);
                     messages.push(assistantMsg);
 
                     // Render messages to chat
