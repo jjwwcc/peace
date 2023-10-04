@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href="icon.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
+    <!-- js -->
+    <script src="responsivevoice.js"></script>
+    <title>PeachCanned</title>
+    <style>
+        /* Styles for header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            background-color: #333;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+        }
+
+        /* Styles for the content below the header */
+        #content {
+            padding: 0 20px;
+            margin-top: 100px;
+            /* Adjust the margin-top value as needed */
+        }
+
+        /* Styles for logo container */
+        #logo {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Styles for logo image */
+        #logo img {
+            margin-right: 10px;
+        }
+
+        /* Styles for logo title */
+        #logo h1 {
+            font-size: 21px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* Styles for menu */
+        .menu {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Styles for menu links */
+        .menu a {
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        /* Styles for menu links hover state */
+        .menu a:hover {
+            background-color: #5d7d20;
+            color: #fff;
+        }
+
+        /* Styles for chat container */
+        #chat {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styles for chat message */
+        .chat-message {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-width: 95%;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* Styles for user chat message */
+        .chat-message-user {
+            background-color: #675636;
+            color: #fff;
+            align-self: flex-end;
+        }
+
+        /* Styles for assistant chat message */
+        .chat-message-assistant {
+            background-color: #fff;
+            color: #000;
+            align-self: flex-start;
+        }
+
+        /* Styles for chat message metadata */
+        .chat-message-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* Styles for chat message timestamp */
+        .chat-message-meta>div:first-child {
+            margin-right: 5px;
+        }
+
+        /* Styles for chat message author */
+        .chat-message-meta>div:last-child {
+            font-weight: bold;
+        }
+
+        /* Styles for chat input form */
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            padding: 0 20px;
+        }
+
+        /* Styles for chat input form labels */
+        form>label {
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Styles for chat input form input fields */
+        form>input[type="text"],
+        form>textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styles for chat input form submit button */
+        form>input[type="submit"] {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #675636;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        /* Styles for save button */
+        #save {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #675636;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        /* Styles for save button hover state */
+        #save:hover {
+            transform: scale(1.1);
+        }
+
+        pre {
+            white-space: pre-wrap;
+        }
+
+        #gptMsg {
+            text-align: center;
+            position: fixed;
+            top: 55px;
+            left: 0;
+            width: 100%;
+            background: #1e542a;
+            color: #fff;
+            display: none;
+            font-size: 1.0em;
+        }
+
+        #error {
+            text-align: center;
+            position: fixed;
+            top: 55px;
+            left: 0;
+            width: 100%;
+            background: #ff0000;
+            color: #fff;
+            display: none;
+            font-size: 1.0em;
+        }
+
+        #footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 8px;
+        }
+
+        .copy-btn {
+            margin-left: auto;
+            font-size: 12px;
+            padding: 3px 5px;
+            border: none;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            opacity: 0.4;
+        }
+
+        #btnSpeak {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #0c0902dc;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        #btnSpeak:hover {
+            transform: scale(1.1);
+        }
+
+        #voice {
+            color: #cac8c8;
+            font-size: smaller;
+        }
+
+        #voiceOn {
+            margin-right: 5px;
+        }
+
+        #voiceOn:checked+label {
+            color: #bdbcba;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div id="logo">
+            <img src="icon.png" alt="logo" width="35">
+            <h1>PeachCanned</h1>
+            <a href="#" id="save" hidden>🍏</a>
+            <button id="btnSpeak">🔴</button>
+        </div>
+        <div class="menu">
+            <a href="#" id="clear">RESET (ESC)</a>
+            <a href="https://jjwwcc.github.io/chat" target="_blank"> CONTACT </a>
+        </div>
+    </header>
+
+    <div id="content">
+        <div id="gptMsg"></div>
+        <div id="error"></div>
+        <div id="voice">
+            <input type="checkbox" id="voiceOn" name="voiceOn" value="voiceOn">
+            <label for="voiceOn">Voice On</label>
+        </div>
+        <div id="chat">
+        </div>
+    </div>
+
+    <form>
+        <label for="token">API keys (Get it from https://beta.openai.com/account/api-keys):</label>
+        <input type="text" name="token" value="">
+        <label for="model">Model:</label>
+        <input type="text" name="model" value="gpt-4-0613">
+        <label for="text">Prompt:</label>
+        <textarea name="text" id="promptInput" cols="30" rows="10" x-webkit-speech></textarea>
+        <input type="submit" value="SUBMIT (Ctrl+Enter)" id="promptSubmit">
+    </form>
+    <div id="footer">
+        <p>© 2023 Peach Canned. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Cache frequently accessed elements
+        const chat = document.getElementById('chat');
+        const form = document.querySelector('form');
+        const saveButton = document.getElementById('save');
+        const tokenInput = document.querySelector('input[name="token"]');
+        const modelInput = document.querySelector('input[name="model"]');
+        const error = document.getElementById('error');
+        const gptMsg = document.getElementById('gptMsg');
+
+        // current date
+        const today = new Date();
+        const dateString = `${today.getMonth() + 1}-${today.getDate()}-${today.getFullYear()}`;
+        const timeStamp = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+
+        // Get data from localstorage
+        let token = localStorage.getItem('token');
+        let model = localStorage.getItem('model');
+
+        // If token exists, set it in the input field and hide the input and label elements
+        if (token) {
+            tokenInput.value = token;
+            tokenInput.style.display = 'none';
+            document.querySelector('label[for="token"]').style.display = 'none';
+            modelInput.style.display = 'none';
+            document.querySelector('label[for="model"]').style.display = 'none';
+        }
+
+        // Define messages array
+        let messages = [{ role: 'system', content: 'You are a helpful assistant.' }];
+
+        // Bind form submit event
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            // Get form data
+            const formData = new FormData(form);
+            const token = formData.get('token');
+            const model = formData.get('model');
+            const prompt = formData.get('text').trim();
+            var deltaMsg = '';
+
+            // Check if token and prompt are not empty
+            if (!token || !prompt) {
+                error.innerHTML = 'Token and text cannot be empty.';
+                return;
+            }
+
+            // Change HTML tags to text
+            const promptText = prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            // Add user message to messages array
+            const userMsg = { role: 'user', content: promptText };
+            messages.push(userMsg);
+
+            // If token doesn't exist, store it in localstorage
+            if (!localStorage.getItem('token')) {
+                localStorage.setItem('token', token);
+            }
+            if (!localStorage.getItem('model')) {
+                localStorage.setItem('model', model);
+            }
+
+            // Show generating message
+            gptMsg.style.display = 'block';
+            gptMsg.innerHTML = '<div style="padding: 15px;">Generating...</div>';
+
+            form.text.value = '';
+            tokenInput.style.display = 'none';
+            document.querySelector('label[for="token"]').style.display = 'none';
+            modelInput.style.display = 'none';
+            document.querySelector('label[for="model"]').style.display = 'none';
+
+            // Disable submit button
+            document.querySelector('#promptSubmit').disabled = true;
+
+            // create div chat-message chat-message-user and append it to chat
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.classList.add('chat-message', 'chat-message-user');
+            userMsgDiv.innerHTML = `<button class="copy-btn">COPY</button><pre>${promptText}</pre><div class="chat-message-meta"><div>${dateString} ${timeStamp}</div><div>You</div></div>`;
+            chat.appendChild(userMsgDiv);
+
+            // create div chat-message chat-message-assistant and append it to chat
+            const assistantMsg = document.createElement('div');
+            assistantMsg.classList.add('chat-message', 'chat-message-assistant');
+            assistantMsg.innerHTML = `<button class="copy-btn">COPY</button><pre>Generating...</pre><div class="chat-message-meta"><div>${dateString} ${timeStamp}</div><div>Assistant</div></div>`;
+            chat.appendChild(assistantMsg);
+
+            // Make request to OpenAI API
+            fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    model,
+                    messages,
+                    stream: true
+                })
+            })
+                .then(response => response.body)
+                .then(body => {
+                    const reader = body.getReader();
+
+                    function readChunk() {
+                        return reader.read().then(({ done, value }) => {
+                            if (done) {
+                                return;
+                            }
+
+                            const text = new TextDecoder("utf-8").decode(value);
+                            // 根据换行符分割数据块
+                            const textArray = text.split('\n');
+                            var fixedMsg;
+                            textArray.forEach((item) => {
+                                fixedMsg = item.replace(/^data: /, '');
+                                try {
+                                    textJson = JSON.parse(fixedMsg);
+                                    textJson.choices.forEach((choice) => {
+                                        if (!choice.delta.content) {
+                                            return;
+                                        }
+                                        deltaMsg += choice.delta.content;
+                                        const allPre = document.getElementsByTagName('pre');
+                                        const lastPre = allPre[allPre.length - 1];
+                                        lastPre.innerText = deltaMsg;
+                                        // handle error response
+                                        if (textJson.error) {
+                                            error.innerHTML = textJson.error.message;
+                                            // show input fields and label elements
+                                            tokenInput.style.display = 'block';
+                                            document.querySelector('label[for="token"]').style.display = 'block';
+                                            modelInput.style.display = 'block';
+                                            document.querySelector('label[for="model"]').style.display = 'block';
+                                            // clear local storage
+                                            localStorage.clear();
+                                        }
+                                    });
+                                    if (textJson.choices[0].finish_reason == 'stop') {
+                                        messages.push({ role: 'assistant', content: deltaMsg });
+                                        // clear generating message
+                                        gptMsg.innerHTML = '';
+                                        error.innerHTML = '';
+                                        // enable submit button
+                                        document.querySelector('#promptSubmit').disabled = false;
+                                        // scroll to bottom
+                                        chat.scrollTop = chat.scrollHeight;
+                                        // if voiceOn is true, speak by using responsiveVoice
+                                        var voiceOn = document.getElementById('voiceOn').checked;
+                                        if (voiceOn) {
+                                            // speak by using responsiveVoice
+                                            if (responsiveVoice.isPlaying()) {
+                                                responsiveVoice.cancel();
+                                            }
+                                            responsiveVoice.speak(deltaMsg, 'US English Male', { rate: 1.5 });
+                                            // android chrome webkit
+                                            const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+                                            if (isPortrait) {
+                                                var phoneVoice = new SpeechSynthesisUtterance();
+                                                phoneVoice.text = deltaMsg;
+                                                window.speechSynthesis.speak(phoneVoice);
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    return;
+                                }
+                            });
+                            // 继续读取更多数据并递归调用
+                            return readChunk();
+                        });
+                    }
+                    readChunk();
+
+                    const copyBtns = document.querySelectorAll('.copy-btn');
+                    copyBtns.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const pre = btn.nextElementSibling;
+                            const text = pre.innerText;
+                            const textarea = document.createElement('textarea');
+                            textarea.value = text;
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textarea);
+                            btn.innerText = 'COPIED';
+                        });
+                    });
+
+                    // // Show save button
+                    // saveButton.style.display = 'block';
+
+                    // Clear prompt textarea
+                    form.text.value = '';
+                    document.documentElement.scrollTop = document.documentElement.scrollHeight;
+                })
+                .catch(error => {
+                    gptMsg.style.display = 'none';
+                    error.innerHTML = error.message;
+                    // Show input fields and label elements
+                    tokenInput.style.display = 'block';
+                    document.querySelector('label[for="token"]').style.display = 'block';
+                    modelInput.style.display = 'block';
+                    document.querySelector('label[for="model"]').style.display = 'block';
+                    // Enable submit button
+                    document.querySelector('#promptSubmit').disabled = false;
+                });
+        });
+
+        // Enable form submission with Ctrl+Enter
+        document.onkeypress = function (e) {
+            if (e.ctrlKey && (e.keyCode === 13 || e.keyCode === 10)) {
+                document.getElementById('promptSubmit').click();
+            }
+        };
+
+        // Bind clear button click event
+        document.getElementById('clear').addEventListener('click', function () {
+            messages = [{ role: 'system', content: 'You are a helpful assistant.' }];
+            chat.innerHTML = '';
+            saveButton.style.display = 'none';
+            document.querySelector('#promptSubmit').disabled = false;
+        });
+
+        if ('webkitSpeechRecognition' in window) {
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'auto';
+
+            var recognizing = false;
+            var promptInput = document.getElementById('promptInput');
+            var btnSpeak = document.getElementById('btnSpeak');
+
+            btnSpeak.addEventListener('click', function () {
+                if (recognizing) {
+                    recognition.stop();
+                    recognizing = false;
+                    btnSpeak.innerText = '🔴';
+                    return;
+                }
+
+                promptInput.value = '';
+
+                recognition.start();
+                recognizing = true;
+                btnSpeak.innerText = '⏸️';
+                if (responsiveVoice.isPlaying()) {
+                    responsiveVoice.cancel();
+                }
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+
+            });
+
+            recognition.onresult = function (event) {
+                var speechResult = event.results[0][0].transcript;
+                promptInput.value = speechResult;
+            };
+
+            recognition.onerror = function (event) {
+                recognizing = false;
+            };
+
+            recognition.onend = function () {
+                recognizing = false;
+                btnSpeak.innerText = '🔴';
+                // submit 
+                document.getElementById('promptSubmit').click();
+            };
+        } else {
+            alert('Speech recognition is not supported in this browser.');
+        }
+
+        // ESC key to clear chat
+        document.onkeydown = function (e) {
+            if (e.keyCode === 27) {
+                document.getElementById('clear').click();
+            }
+        };
+
+        // ctrl+space to btnSpeak
+        document.onkeydown = function (e) {
+            if (e.ctrlKey && e.keyCode === 32) {
+                document.getElementById('btnSpeak').click();
+            }
+        };
+
+        // Bind save button click event
+        document.getElementById('save').addEventListener('click', function () {
+            const chatContainer = document.getElementById('chat');
+            const chatMessages = chatContainer.querySelectorAll('.chat-message');
+            let formattedChat = '';
+            chatMessages.forEach((message) => {
+                const preElement = message.querySelector('pre');
+                if (preElement) {
+                    const text = preElement.innerText.trim();
+                    const sender = message.classList.contains('chat-message-user') ? 'You' : 'Assistant';
+                    formattedChat += `**${sender}:** ${text}\n---\n`;
+                }
+            });
+            // Send formatted chat to server for saving
+            fetch('https://eoehbx03hkglojd.m.pipedream.net', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    'title': 'peachTree-bot' + timeStamp,
+                    'content': formattedChat
+                })
+            })
+                .then(response => response.text())
+                .then(text => {
+                    console.log(text);
+                    saveButton.style.display = 'none';
+                }
+                )
+                .catch(error => console.error(error));
+        });
+
+    </script>
+</body>
+
+</html>
