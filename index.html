@@ -301,8 +301,8 @@
     </div>
 
     <form>
-        <label for="token">API keys:</label>
-        <input type="text" name="token" value="">
+        <label for="qtoken">API keys:</label>
+        <input type="text" name="qtoken" value="">
         <label for="text">Prompt:</label>
         <textarea name="text" id="promptInput" cols="30" rows="10" x-webkit-speech></textarea>
         <input type="submit" value="SUBMIT (Ctrl+Enter)" id="promptSubmit">
@@ -315,7 +315,7 @@
         // Cache frequently accessed elements
         const chat = document.getElementById('chat');
         const form = document.querySelector('form');
-        const tokenInput = document.querySelector('input[name="token"]');
+        const qtokenInput = document.querySelector('input[name="qtoken"]');
         const error = document.getElementById('error');
         const gptMsg = document.getElementById('gptMsg');
 
@@ -325,13 +325,13 @@
         const timeStamp = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
 
         // Get data from localstorage
-        let token = localStorage.getItem('token');
+        let qtoken = localStorage.getItem('qtoken');
 
-        // If token exists, set it in the input field and hide the input and label elements
-        if (token) {
-            tokenInput.value = token;
-            tokenInput.style.display = 'none';
-            document.querySelector('label[for="token"]').style.display = 'none';
+        // If qtoken exists, set it in the input field and hide the input and label elements
+        if (qtoken) {
+            qtokenInput.value = qtoken;
+            qtokenInput.style.display = 'none';
+            document.querySelector('label[for="qtoken"]').style.display = 'none';
         }
 
         // Bind form submit event
@@ -339,22 +339,22 @@
             e.preventDefault();
             // Get form data
             const formData = new FormData(form);
-            const token = formData.get('token');
+            const qtoken = formData.get('qtoken');
             const prompt = formData.get('text').trim();
             var deltaMsg = '';
 
-            // Check if token and prompt are not empty
-            if (!token || !prompt) {
-                error.innerHTML = 'Token and text cannot be empty.';
+            // Check if qtoken and prompt are not empty
+            if (!qtoken || !prompt) {
+                error.innerHTML = 'qtoken and text cannot be empty.';
                 return;
             }
 
             // Change HTML tags to text
             const promptText = prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-            // If token doesn't exist, store it in localstorage
-            if (!localStorage.getItem('token')) {
-                localStorage.setItem('token', token);
+            // If qtoken doesn't exist, store it in localstorage
+            if (!localStorage.getItem('qtoken')) {
+                localStorage.setItem('qtoken', qtoken);
             }
             if (!localStorage.getItem('model')) {
                 localStorage.setItem('model', model);
@@ -365,8 +365,9 @@
             gptMsg.innerHTML = '<div style="padding: 15px;">Generating...</div>';
 
             form.text.value = '';
-            tokenInput.style.display = 'none';
-            document.querySelector('label[for="token"]').style.display = 'none';
+            qtokenInput.style.display = 'none';
+            document.querySelector('label[for="qtoken"]').style.display = 'none';
+
 
             // Disable submit button
             document.querySelector('#promptSubmit').disabled = true;
@@ -390,7 +391,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    token: prompt
+                    qtoken: prompt
                 })
             })
                 .then(response => response.body)
@@ -423,8 +424,8 @@
                                         if (textJson.error) {
                                             error.innerHTML = textJson.error.message;
                                             // show input fields and label elements
-                                            tokenInput.style.display = 'block';
-                                            document.querySelector('label[for="token"]').style.display = 'block';
+                                            qtokenInput.style.display = 'block';
+                                            document.querySelector('label[for="qtoken"]').style.display = 'block';
                                             modelInput.style.display = 'block';
                                             document.querySelector('label[for="model"]').style.display = 'block';
                                             // clear local storage
@@ -493,8 +494,8 @@
                     gptMsg.style.display = 'none';
                     error.innerHTML = error.message;
                     // Show input fields and label elements
-                    tokenInput.style.display = 'block';
-                    document.querySelector('label[for="token"]').style.display = 'block';
+                    qtokenInput.style.display = 'block';
+                    document.querySelector('label[for="qtoken"]').style.display = 'block';
                     modelInput.style.display = 'block';
                     document.querySelector('label[for="model"]').style.display = 'block';
                     // Enable submit button
