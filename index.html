@@ -413,6 +413,9 @@
                     const assistantMsg = { role: 'assistant', content: answer };
                     messages.push(assistantMsg);
 
+                    console.log(assistantMsg);
+                    console.log(messages);
+
                     // Render messages to chat
                     let chatContent = '';
                     messages.forEach(message => {
