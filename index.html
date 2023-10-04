@@ -356,9 +356,6 @@
             if (!localStorage.getItem('qtoken')) {
                 localStorage.setItem('qtoken', qtoken);
             }
-            if (!localStorage.getItem('model')) {
-                localStorage.setItem('model', model);
-            }
 
             // Show generating message
             gptMsg.style.display = 'block';
@@ -446,8 +443,6 @@
                     // Show input fields and label elements
                     qtokenInput.style.display = 'block';
                     document.querySelector('label[for="qtoken"]').style.display = 'block';
-                    modelInput.style.display = 'block';
-                    document.querySelector('label[for="model"]').style.display = 'block';
                     // Enable submit button
                     document.querySelector('#promptSubmit').disabled = false;
                 });
