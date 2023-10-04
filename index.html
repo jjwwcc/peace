@@ -456,6 +456,23 @@
                     // Clear prompt textarea
                     form.text.value = '';
                     document.documentElement.scrollTop = document.documentElement.scrollHeight;
+
+                    // if voiceOn is true, speak by using responsiveVoice
+                    var voiceOn = document.getElementById('voiceOn').checked;
+                    if (voiceOn) {
+                        // speak by using responsiveVoice
+                        if (responsiveVoice.isPlaying()) {
+                            responsiveVoice.cancel();
+                        }
+                        responsiveVoice.speak(deltaMsg, 'US English Male', { rate: 1.5 });
+                        // android chrome webkit
+                        const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+                        if (isPortrait) {
+                            var phoneVoice = new SpeechSynthesisUtterance();
+                            phoneVoice.text = deltaMsg;
+                            window.speechSynthesis.speak(phoneVoice);
+                        }
+                    }
                 })
                 .catch(error => {
                     gptMsg.style.display = 'none';
