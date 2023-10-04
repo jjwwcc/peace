@@ -394,97 +394,43 @@
                     qtoken: prompt
                 })
             })
-                .then(response => response.body)
-                .then(body => {
-                    const reader = body.getReader();
+                .then(response => response.json())
+                .then(response => {
+                    // Clear generating message
+                    gptMsg.innerHTML = '';
+                    error.innerHTML = '';
+                    // Enable submit button
+                    document.querySelector('#promptSubmit').disabled = false;
 
-                    function readChunk() {
-                        return reader.read().then(({ done, value }) => {
-                            if (done) {
-                                return;
-                            }
-
-                            const text = new TextDecoder("utf-8").decode(value);
-                            // 根据换行符分割数据块
-                            const textArray = text.split('\n');
-                            var fixedMsg;
-                            textArray.forEach((item) => {
-                                fixedMsg = item.replace(/^data: /, '');
-                                try {
-                                    textJson = JSON.parse(fixedMsg);
-                                    textJson.choices.forEach((choice) => {
-                                        if (!choice.delta.content) {
-                                            return;
-                                        }
-                                        deltaMsg += choice.delta.content;
-                                        const allPre = document.getElementsByTagName('pre');
-                                        const lastPre = allPre[allPre.length - 1];
-                                        lastPre.innerText = deltaMsg;
-                                        // handle error response
-                                        if (textJson.error) {
-                                            error.innerHTML = textJson.error.message;
-                                            // show input fields and label elements
-                                            qtokenInput.style.display = 'block';
-                                            document.querySelector('label[for="qtoken"]').style.display = 'block';
-                                            modelInput.style.display = 'block';
-                                            document.querySelector('label[for="model"]').style.display = 'block';
-                                            // clear local storage
-                                            localStorage.clear();
-                                        }
-                                    });
-                                    if (textJson.choices[0].finish_reason == 'stop') {
-                                        messages.push({ role: 'assistant', content: deltaMsg });
-                                        // clear generating message
-                                        gptMsg.innerHTML = '';
-                                        error.innerHTML = '';
-                                        // enable submit button
-                                        document.querySelector('#promptSubmit').disabled = false;
-                                        // scroll to bottom
-                                        chat.scrollTop = chat.scrollHeight;
-                                        // if voiceOn is true, speak by using responsiveVoice
-                                        var voiceOn = document.getElementById('voiceOn').checked;
-                                        if (voiceOn) {
-                                            // speak by using responsiveVoice
-                                            if (responsiveVoice.isPlaying()) {
-                                                responsiveVoice.cancel();
-                                            }
-                                            responsiveVoice.speak(deltaMsg, 'US English Male', { rate: 1.5 });
-                                            // android chrome webkit
-                                            const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-                                            if (isPortrait) {
-                                                var phoneVoice = new SpeechSynthesisUtterance();
-                                                phoneVoice.text = deltaMsg;
-                                                window.speechSynthesis.speak(phoneVoice);
-                                            }
-                                        }
-                                    }
-                                } catch (e) {
-                                    return;
-                                }
-                            });
-                            // 继续读取更多数据并递归调用
-                            return readChunk();
-                        });
+                    // Handle error response
+                    if (response.error) {
+                        error.innerHTML = response.error.message;
+                        return;
                     }
-                    readChunk();
 
-                    const copyBtns = document.querySelectorAll('.copy-btn');
-                    copyBtns.forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const pre = btn.nextElementSibling;
-                            const text = pre.innerText;
-                            const textarea = document.createElement('textarea');
-                            textarea.value = text;
-                            document.body.appendChild(textarea);
-                            textarea.select();
-                            document.execCommand('copy');
-                            document.body.removeChild(textarea);
-                            btn.innerText = 'COPIED';
-                        });
+                    // Add assistant message to messages array
+                    const assistantMsg = { role: 'assistant', content: response.choices[0].message.content };
+                    messages.push(assistantMsg);
+
+                    // Render messages to chat
+                    let chatContent = '';
+                    messages.forEach(message => {
+                        if (message.role === 'system') {
+                            return;
+                        }
+                        const roleClass = message.role === 'user' ? 'chat-message-user' : 'chat-message-assistant';
+                        chatContent += `
+                            <div class="chat-message ${roleClass}">
+                            <button class="copy-btn">COPY</button>
+                            <pre>${message.content}</pre>
+                            <div class="chat-message-meta">
+                                <div>${new Date().toLocaleString()}</div>
+                                <div>${message.role === 'user' ? 'You' : 'Assistant'}</div>
+                            </div>
+                            </div>
+                        `;
                     });
-
-                    // // Show save button
-                    // saveButton.style.display = 'block';
+                    chat.innerHTML = chatContent;
 
                     // Clear prompt textarea
                     form.text.value = '';
@@ -582,39 +528,6 @@
                 document.getElementById('btnSpeak').click();
             }
         };
-
-        // Bind save button click event
-        document.getElementById('save').addEventListener('click', function () {
-            const chatContainer = document.getElementById('chat');
-            const chatMessages = chatContainer.querySelectorAll('.chat-message');
-            let formattedChat = '';
-            chatMessages.forEach((message) => {
-                const preElement = message.querySelector('pre');
-                if (preElement) {
-                    const text = preElement.innerText.trim();
-                    const sender = message.classList.contains('chat-message-user') ? 'You' : 'Assistant';
-                    formattedChat += `**${sender}:** ${text}\n---\n`;
-                }
-            });
-            // Send formatted chat to server for saving
-            fetch('https://eoehbx03hkglojd.m.pipedream.net', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    'title': 'peachTree-bot' + timeStamp,
-                    'content': formattedChat
-                })
-            })
-                .then(response => response.text())
-                .then(text => {
-                    console.log(text);
-                    saveButton.style.display = 'none';
-                }
-                )
-                .catch(error => console.error(error));
-        });
 
     </script>
 </body>
