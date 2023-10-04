@@ -410,9 +410,10 @@
                         return;
                     }
 
+                    var answer = response.text;
+
                     // Add assistant message to messages array
-                    const assistantMsg = { role: 'assistant', content: response.text };
-                    console.log(response.text);
+                    const assistantMsg = { role: 'assistant', content: answer };
                     messages.push(assistantMsg);
 
                     // Render messages to chat
