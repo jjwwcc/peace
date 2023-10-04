@@ -464,12 +464,12 @@
                         if (responsiveVoice.isPlaying()) {
                             responsiveVoice.cancel();
                         }
-                        responsiveVoice.speak(deltaMsg, 'US English Male', { rate: 1.5 });
+                        responsiveVoice.speak(answer, 'Chinese Male', { rate: 1.5 });
                         // android chrome webkit
                         const isPortrait = window.matchMedia("(orientation: portrait)").matches;
                         if (isPortrait) {
                             var phoneVoice = new SpeechSynthesisUtterance();
-                            phoneVoice.text = deltaMsg;
+                            phoneVoice.text = answer;
                             window.speechSynthesis.speak(phoneVoice);
                         }
                     }
