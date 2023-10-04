@@ -301,16 +301,14 @@
     </div>
 
     <form>
-        <label for="token">API keys (Get it from https://beta.openai.com/account/api-keys):</label>
+        <label for="token">API keys:</label>
         <input type="text" name="token" value="">
-        <label for="model">Model:</label>
-        <input type="text" name="model" value="gpt-4-0613">
         <label for="text">Prompt:</label>
         <textarea name="text" id="promptInput" cols="30" rows="10" x-webkit-speech></textarea>
         <input type="submit" value="SUBMIT (Ctrl+Enter)" id="promptSubmit">
     </form>
     <div id="footer">
-        <p>© 2023 Peach Canned. All rights reserved.</p>
+        <p>© 2023 Peace is Peaceful. All rights reserved.</p>
     </div>
 
     <script>
@@ -319,7 +317,6 @@
         const form = document.querySelector('form');
         const saveButton = document.getElementById('save');
         const tokenInput = document.querySelector('input[name="token"]');
-        const modelInput = document.querySelector('input[name="model"]');
         const error = document.getElementById('error');
         const gptMsg = document.getElementById('gptMsg');
 
@@ -340,9 +337,6 @@
             modelInput.style.display = 'none';
             document.querySelector('label[for="model"]').style.display = 'none';
         }
-
-        // Define messages array
-        let messages = [{ role: 'system', content: 'You are a helpful assistant.' }];
 
         // Bind form submit event
         form.addEventListener('submit', function (e) {
@@ -401,16 +395,13 @@
             chat.appendChild(assistantMsg);
 
             // Make request to OpenAI API
-            fetch('https://api.openai.com/v1/chat/completions', {
+            fetch('https://ask_ai_me.jjwwcc3115.workers.dev', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    model,
-                    messages,
-                    stream: true
+                    token: prompt
                 })
             })
                 .then(response => response.body)
