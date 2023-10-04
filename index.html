@@ -279,7 +279,7 @@
     <header>
         <div id="logo">
             <img src="icon.png" alt="logo" width="35">
-            <h1>PeachCanned</h1>
+            <h1>Peace is Peace</h1>
             <a href="#" id="save" hidden>🍏</a>
             <button id="btnSpeak">🔴</button>
         </div>
@@ -327,6 +327,9 @@
         // Get data from localstorage
         let qtoken = localStorage.getItem('qtoken');
 
+        // Define messages array
+        let messages = [];
+
         // If qtoken exists, set it in the input field and hide the input and label elements
         if (qtoken) {
             qtokenInput.value = qtoken;
@@ -351,6 +354,16 @@
 
             // Change HTML tags to text
             const promptText = prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            // Add user message to messages array
+            const userMsg = { role: 'user', content: promptText };
+            messages.push(userMsg);
+
+            // 提取messages里面的所有content并作为字符串连接起来，用句号分隔
+            var deltaMsg = messages.map(function (item) {
+                return item.content;
+            }).join('. ');
+
+            console.log(deltaMsg);
 
             // If qtoken doesn't exist, store it in localstorage
             if (!localStorage.getItem('qtoken')) {
@@ -381,6 +394,12 @@
             assistantMsg.innerHTML = `<button class="copy-btn">COPY</button><pre>Generating...</pre><div class="chat-message-meta"><div>${dateString} ${timeStamp}</div><div>Assistant</div></div>`;
             chat.appendChild(assistantMsg);
 
+
+            let variableName = qtoken;
+
+            let requestData = {};
+            requestData[variableName] = deltaMsg;
+
             // Make request to OpenAI API
             fetch('https://ask_ai_me.jjwwcc3115.workers.dev', {
                 method: 'POST',
@@ -389,9 +408,7 @@
                     'Access-Control-Allow-Origin': '*',
                     'mode': 'no-cors'
                 },
-                body: JSON.stringify({
-                    question: prompt
-                })
+                body: JSON.stringify(requestData)
             })
                 .then(response => response.json())
                 .then(response => {
@@ -413,7 +430,7 @@
                     const assistantMsg = { role: 'assistant', content: answer };
                     messages.push(assistantMsg);
 
-                    console.log(assistantMsg);
+                    // console.log(assistantMsg);
                     console.log(messages);
 
                     // Render messages to chat
