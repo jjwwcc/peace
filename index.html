@@ -394,11 +394,19 @@
             assistantMsg.innerHTML = `<button class="copy-btn">COPY</button><pre>Generating...</pre><div class="chat-message-meta"><div>${dateString} ${timeStamp}</div><div>Assistant</div></div>`;
             chat.appendChild(assistantMsg);
 
+            // filter deltaMsg 只保留role为user的
+            var promptMsg = messages.filter(function (item) {
+                return item.role === 'user';
+            }).map(function (item) {
+                return item.content;
+            }).join('. ');
+
+            console.log(promptMsg);
+
 
             let variableName = qtoken;
-
             let requestData = {};
-            requestData[variableName] = deltaMsg;
+            requestData[variableName] = promptMsg;
 
             // Make request to OpenAI API
             fetch('https://ask_ai_me.jjwwcc3115.workers.dev', {
@@ -431,7 +439,7 @@
                     messages.push(assistantMsg);
 
                     // console.log(assistantMsg);
-                    console.log(messages);
+                    // console.log(messages);
 
                     // Render messages to chat
                     let chatContent = '';
@@ -456,23 +464,6 @@
                     // Clear prompt textarea
                     form.text.value = '';
                     document.documentElement.scrollTop = document.documentElement.scrollHeight;
-
-                    // if voiceOn is true, speak by using responsiveVoice
-                    var voiceOn = document.getElementById('voiceOn').checked;
-                    if (voiceOn) {
-                        // speak by using responsiveVoice
-                        if (responsiveVoice.isPlaying()) {
-                            responsiveVoice.cancel();
-                        }
-                        responsiveVoice.speak(answer, 'Chinese Male', { rate: 1.5 });
-                        // android chrome webkit
-                        const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-                        if (isPortrait) {
-                            var phoneVoice = new SpeechSynthesisUtterance();
-                            phoneVoice.text = answer;
-                            window.speechSynthesis.speak(phoneVoice);
-                        }
-                    }
                 })
                 .catch(error => {
                     gptMsg.style.display = 'none';
@@ -485,6 +476,23 @@
                 });
         });
 
+        // if voiceOn is true, speak by using responsiveVoice
+        var voiceOn = document.getElementById('voiceOn').checked;
+        if (voiceOn) {
+            // speak by using responsiveVoice
+            if (responsiveVoice.isPlaying()) {
+                responsiveVoice.cancel();
+            }
+            responsiveVoice.speak(answer, 'Chinese Male', { rate: 1.5 });
+            // android chrome webkit
+            const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+            if (isPortrait) {
+                var phoneVoice = new SpeechSynthesisUtterance();
+                phoneVoice.text = answer;
+                window.speechSynthesis.speak(phoneVoice);
+            }
+        }
+
         // Enable form submission with Ctrl+Enter
         document.onkeypress = function (e) {
             if (e.ctrlKey && (e.keyCode === 13 || e.keyCode === 10)) {
@@ -494,7 +502,7 @@
 
         // Bind clear button click event
         document.getElementById('clear').addEventListener('click', function () {
-            messages = [{ role: 'system', content: 'You are a helpful assistant.' }];
+            messages = [];
             chat.innerHTML = '';
             saveButton.style.display = 'none';
             document.querySelector('#promptSubmit').disabled = false;
