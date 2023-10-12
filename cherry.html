@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            background-color: #f3f3f3;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #noteForm {
+            border: 2px solid #999;
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 700px;
+            background-color: #fff;
+            position: relative;
+        }
+
+        #noteForm h1 {
+            text-align: center;
+        }
+
+        #noteForm textarea {
+            width: 100%;
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        #submit {
+            background-color: #699ae0;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #submit:hover {
+            background-color: #6897dc;
+        }
+
+        #successMessage {
+            background-color: #d6fbd6;
+            padding: 10px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        #errorMessage {
+            background-color: #fdd;
+            padding: 10px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        /* token */
+        input[name="token"] {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="noteForm" onsubmit="return postNote()">
+        <h1>Cherry</h1>
+        <!-- token label -->
+        <label for="token">Token: </label>
+        <input name="token" id="token" value="">
+        <textarea id="noteContent" placeholder="About Cherry"></textarea>
+        <button id="submit" type="submit">Save</button>
+        <div id="successMessage">Success!</div>
+        <div id="errorMessage">Error!</div>
+    </form>
+    <script>
+        var token = localStorage.getItem('token');
+        if (token) {
+            document.getElementsByName('token')[0].style.display = 'none';
+            document.getElementsByTagName('label')[0].style.display = 'none';
+        }
+        function postNote() {
+            if (!token) {
+                let url = new URL(window.location.href);
+                token = url.searchParams.get("token");
+                if (!token) {
+                    token = document.getElementsByName('token')[0].value;
+                    localStorage.setItem('token', token);
+                }
+            }
+            let noteContent = document.getElementById('noteContent').value;
+            // 删除回车符等特殊字符
+            noteContent = noteContent.replace(/[\r\n]/g, "");
+            let url = "https://notes.jjwwcc3115.workers.dev";
+            let data = { notes: noteContent };
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": token
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    //   if data.id is true, then show success message or show error message
+                    if (data.id) {
+                        document.getElementById('successMessage').style.display = 'block';
+                        // 显示id
+                        document.getElementById('successMessage').innerHTML = 'Success! Your note id is ' + data.id;
+                    } else {
+                        document.getElementById('successMessage').style.display = 'none';
+                        document.getElementById('errorMessage').style.display = 'block';
+                    }
+
+                });
+            return false;
+        }
+    </script>
+</body>
+
+</html>
