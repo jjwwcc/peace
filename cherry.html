@@ -94,8 +94,8 @@
         <div id="errorMessage">Error!</div>
     </form>
     <script>
-        var token = localStorage.getItem('token');
-        if (token) {
+        var note_token = localStorage.getItem('note_token');
+        if (note_token) {
             document.getElementsByName('token')[0].style.display = 'none';
             document.getElementsByTagName('label')[0].style.display = 'none';
         }
