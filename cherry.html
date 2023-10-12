@@ -95,16 +95,16 @@
     </form>
     <script>
         var note_token = localStorage.getItem('note_token');
-        if (note_token) {
+        if (note_token != null || note_token != undefined) {
             document.getElementsByName('note_token')[0].style.display = 'none';
             document.getElementsByTagName('label')[0].style.display = 'none';
         }
         function postNote() {
             if (!note_token) {
                 let url = new URL(window.location.href);
-                token = url.searchParams.get("note_token");
-                if (!note_token) {
-                    token = document.getElementsByName('note_token')[0].value;
+                note_token = url.searchParams.get("note_token");
+                if (!note_token || note_token == null || note_token == undefined) {
+                    note_token = document.getElementsByName('note_token')[0].value;
                     localStorage.setItem('note_token', note_token);
                 }
             }
